@@ -3,7 +3,7 @@ lockfileVersion: 5.3
 specifiers:
   '@commitlint/cli': ^13
   '@commitlint/config-conventional': ^14
-  '@guardian/consent-management-platform': ^8
+  '@guardian/consent-management-platform': ^8.0.1
   '@guardian/eslint-config-typescript': ^0.7
   '@guardian/libs': 3.3.0
   '@guardian/prettier': ^0.7
@@ -28,10 +28,14 @@ specifiers:
   mockdate: ^3.0.5
   npm-run-all: ^4.1.5
   prettier: ^2.4.1
+  rxjs: ^7.4.0
   semantic-release: ^18.0.0
   ts-jest: ^27.0.7
   typescript: ^4.4.4
   web-vitals: ^2.1.2
+
+dependencies:
+  rxjs: 7.4.0
 
 devDependencies:
   '@commitlint/cli': 13.2.1
@@ -5344,6 +5348,12 @@ packages:
       tslib: 1.14.1
     dev: true
 
+  /rxjs/7.4.0:
+    resolution: {integrity: sha512-7SQDi7xeTMCJpqViXh8gL/lebcwlp3d831F05+9B44A4B0WfsEwUQHR64gsH1kvJ+Ep/J9K2+n1hVl1CsGN23w==}
+    dependencies:
+      tslib: 2.1.0
+    dev: false
+
   /safe-buffer/5.1.2:
     resolution: {integrity: sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g==}
     dev: true
@@ -5945,6 +5955,10 @@ packages:
   /tslib/1.14.1:
     resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}
     dev: true
+
+  /tslib/2.1.0:
+    resolution: {integrity: sha512-hcVC3wYEziELGGmEEXue7D75zbwIIVUMWAVbHItGPx0ziyXxrOMQx4rQEVEV45Ut/1IotuEvwqPopzIOkDMf0A==}
+    dev: false
 
   /tslib/2.3.1:
     resolution: {integrity: sha512-77EbyPPpMz+FRFRuAFlWMtmgUWGe9UOG2Z25NqCwiIjRhOf5iKGuzSe5P2w1laq+FkRy4p+PCuVkJSGkzTEKVw==}
