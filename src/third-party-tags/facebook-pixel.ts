@@ -1,4 +1,4 @@
-import type { GetThirdPartyTag } from '../types';
+import type { GetThirdPartyTag } from './types';
 
 export const fbPixel: GetThirdPartyTag = ({ shouldRun }) => ({
 	shouldRun,

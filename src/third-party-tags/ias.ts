@@ -1,4 +1,4 @@
-import type { GetThirdPartyTag } from '../types';
+import type { GetThirdPartyTag } from './types';
 
 export const ias: GetThirdPartyTag = ({ shouldRun }) => ({
 	shouldRun,
