@@ -1,8 +1,8 @@
 import type { ConsentState } from '@guardian/consent-management-platform/dist/types';
 import { getCookie } from '@guardian/libs';
-import { buildAdsConfigWithConsent } from './ad-targeting-youtube';
-import { canUseDom } from './lib/can-use-dom';
-import { getPermutivePFPSegments } from './permutive';
+import { getPermutivePFPSegments } from '../permutive';
+import { buildAdsConfigWithConsent } from './youtube';
+import { canUseDom } from '$lib/can-use-dom';
 
 jest.mock('./lib/can-use-dom');
 jest.mock('./permutive');

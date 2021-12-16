@@ -1,18 +1,42 @@
 import type { ConsentState } from '@guardian/consent-management-platform/dist/types';
 import { getCookie } from '@guardian/libs';
-import { canUseDom } from './lib/can-use-dom';
-import { constructQuery } from './lib/construct-query';
-import { getPermutivePFPSegments } from './permutive';
-import type {
-	AdsConfig,
-	AdsConfigBasic,
-	AdsConfigCCPAorAus,
-	AdsConfigDisabled,
-	AdsConfigTCFV2,
-	MaybeArray,
-} from './types';
+import { getPermutivePFPSegments } from '../permutive';
+import type { MaybeArray } from '../types';
+import { canUseDom } from '$lib/can-use-dom';
+import { constructQuery } from '$lib/construct-query';
 
-type CustomParams = Record<string, MaybeArray<string | number | boolean>>;
+type AdsConfigDisabled = {
+	disableAds: true;
+};
+
+type AdsConfigBasic = {
+	adTagParameters: {
+		iu: string;
+		cust_params: string;
+	};
+};
+
+type AdsConfigCCPAorAus = AdsConfigBasic & {
+	restrictedDataProcessor: boolean;
+};
+
+type AdsConfigTCFV2 = AdsConfigBasic & {
+	adTagParameters: {
+		cmpGdpr: number;
+		cmpVcd: string;
+		cmpGvcd: string;
+	};
+	nonPersonalizedAd: boolean;
+};
+
+type AdsConfigEnabled = AdsConfigBasic | AdsConfigCCPAorAus | AdsConfigTCFV2;
+
+type AdsConfig = AdsConfigEnabled | AdsConfigDisabled;
+
+export type CustomParams = Record<
+	string,
+	MaybeArray<string | number | boolean>
+>;
 
 const disabledAds: AdsConfigDisabled = { disableAds: true };
 
