@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-	"noUncheckedIndexedAccess": true,
+    "noUncheckedIndexedAccess": true,
     "allowJs": true,
     "esModuleInterop": true,
     "isolatedModules": true,
@@ -16,6 +16,11 @@
     ],
     "module": "ES6",
     "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "$lib": ["src/lib"],
+      "$lib/*": ["src/lib/*"]
+    },
     "noEmit": true,
     "strict": true,
     "target": "ES2020"

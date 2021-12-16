@@ -8,6 +8,11 @@
   "extends": ["@guardian/eslint-config-typescript"],
   "globals": { "googletag": "readonly" },
   "ignorePatterns": ["dist", "coverage", "src/__vendor"],
+  "settings": {
+    "import/resolver": {
+      "typescript": {}
+    }
+  },
   "rules": {
     "curly": ["error", "multi-line"],
     "no-use-before-define": ["error", { "functions": true, "classes": true }]
