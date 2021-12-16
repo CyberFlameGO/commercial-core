@@ -1,3 +1,5 @@
+/* istanbul ignore file -- this is only an entry point */
+
 // Core methods
 export { getContentTargeting } from './content';
 export { getPersonalisedTargeting } from './personalised';
