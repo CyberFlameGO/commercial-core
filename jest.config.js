@@ -8,4 +8,7 @@ module.exports = {
 	collectCoverageFrom: ['src/**/*'],
 	coveragePathIgnorePatterns: ['vendor'],
 	testEnvironment: 'jsdom',
+	moduleNameMapper: {
+		'$lib/(.*)': '<rootDir>/src/lib/$1',
+	},
 };
