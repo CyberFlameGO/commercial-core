@@ -1,9 +1,9 @@
 import type { ConsentState } from '@guardian/consent-management-platform/dist/types';
 import { getCookie } from '@guardian/libs';
+import { canUseDom } from '../lib/can-use-dom';
+import { constructQuery } from '../lib/construct-query';
 import { getPermutivePFPSegments } from '../permutive';
 import type { MaybeArray } from '../types';
-import { canUseDom } from '$lib/can-use-dom';
-import { constructQuery } from '$lib/construct-query';
 
 type AdsConfigDisabled = {
 	disableAds: true;
