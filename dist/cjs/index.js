@@ -21,6 +21,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.pickTargetingValues = exports.getViewportTargeting = exports.getSharedTargeting = exports.getSessionTargeting = exports.getPersonalisedTargeting = exports.getContentTargeting = exports.constants = exports.disabledAds = exports.buildAdsConfigWithConsent = exports.getPermutivePFPSegments = exports.getPermutiveSegments = exports.clearPermutiveSegments = exports.isAdBlockInUse = exports.getAdSize = exports.adSizes = exports.initCommercialMetrics = exports.bypassCommercialMetricsSampling = exports.EventTimer = exports.remarketing = exports.inizio = exports.twitter = exports.fbPixel = exports.permutive = exports.ias = void 0;
+console.log('Well well well');
 var ias_1 = require("./third-party-tags/ias");
 Object.defineProperty(exports, "ias", { enumerable: true, get: function () { return ias_1.ias; } });
 var permutive_1 = require("./third-party-tags/permutive");
