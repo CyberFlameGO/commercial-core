@@ -76,14 +76,12 @@
     "typescript": "^4.5.2",
     "web-vitals": "^2.1.2"
   },
-  "dependencies": {
-    "type-fest": "^2.11.2"
-  },
   "publishConfig": {
     "access": "public"
   },
   "peerDependencies": {
     "@guardian/ab-core": "^2.0.0",
-    "@guardian/libs": "^3.3.0"
+    "@guardian/libs": "^3.3.0",
+    "type-fest": "^2.11.2"
   }
 }
