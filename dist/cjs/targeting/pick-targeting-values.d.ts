@@ -21,5 +21,5 @@ declare type ValidTargetingObject<Base> = ConditionalExcept<Base, null | undefin
  * clean.invalid
  * ```
  */
-export declare const pickTargetingValues: <T extends Record<string, string | readonly string[] | undefined>>(obj: T) => import("type-fest").Except<T, NonNullable<{ [Key in keyof T]: T[Key] extends number | boolean | "" | never[] | readonly [] | readonly [""] | null | undefined ? Key : never; }[keyof T]>>;
+export declare const pickTargetingValues: <T extends Record<string, string | readonly string[] | undefined>>(obj: T) => ValidTargetingObject<T>;
 export {};
