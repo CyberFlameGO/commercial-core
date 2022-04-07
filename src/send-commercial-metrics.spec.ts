@@ -1,3 +1,5 @@
+import { onConsentChange as onConsentChange_ } from '@guardian/consent-management-platform';
+import type { Callback } from '@guardian/consent-management-platform/dist/types';
 import { EventTimer } from './event-timer';
 import {
 	_,
@@ -13,6 +15,14 @@ const {
 	roundTimeStamp,
 	transformToObjectEntries,
 } = _;
+
+jest.mock('@guardian/consent-management-platform', () => ({
+	onConsentChange: jest.fn(),
+}));
+
+const onConsentChange = onConsentChange_ as jest.MockedFunction<
+	typeof onConsentChange_
+>;
 
 const PAGE_VIEW_ID = 'pv_id_1234567890';
 const BROWSER_ID = 'bwid_abcdefghijklm';
@@ -35,6 +45,55 @@ const defaultMetrics = {
 	],
 };
 
+const tcfv2AllConsent = (callback: Callback) =>
+	callback({
+		tcfv2: {
+			consents: {
+				1: true,
+				2: true,
+				3: true,
+				4: true,
+				5: true,
+				6: true,
+				7: true,
+				8: true,
+				9: true,
+				10: true,
+			},
+			vendorConsents: { 100: true, 200: true, 300: true },
+			eventStatus: 'tcloaded',
+			addtlConsent: '',
+			gdprApplies: true,
+			tcString: 'blablabla',
+		},
+	});
+
+const tcfv2AllConsentExceptPurpose8 = (callback: Callback) =>
+	callback({
+		tcfv2: {
+			consents: {
+				1: true,
+				2: true,
+				3: true,
+				4: true,
+				5: true,
+				6: true,
+				7: true,
+				8: false,
+				9: true,
+				10: true,
+			},
+			vendorConsents: { 100: true, 200: true, 300: true },
+			eventStatus: 'tcloaded',
+			addtlConsent: '',
+			gdprApplies: true,
+			tcString: 'blablabla',
+		},
+	});
+
+const nonTcfv2Consent = (callback: Callback) =>
+	callback({ ccpa: { doNotSell: false } });
+
 const setVisibility = (value: 'hidden' | 'visible'): void => {
 	Object.defineProperty(document, 'visibilityState', {
 		value,
@@ -44,6 +103,7 @@ const setVisibility = (value: 'hidden' | 'visible'): void => {
 
 beforeEach(() => {
 	reset();
+	jest.resetAllMocks();
 });
 
 describe('send commercial metrics code', () => {
@@ -60,6 +120,7 @@ describe('send commercial metrics code', () => {
 		.mockImplementation(() => false);
 
 	it('can send commercial metrics when the page is hidden', () => {
+		onConsentChange.mockImplementation(tcfv2AllConsent);
 		initCommercialMetrics({
 			pageViewId: PAGE_VIEW_ID,
 			browserId: BROWSER_ID,
@@ -76,6 +137,7 @@ describe('send commercial metrics code', () => {
 	});
 
 	it('commercial metrics not sent when window is visible', () => {
+		onConsentChange.mockImplementation(tcfv2AllConsent);
 		initCommercialMetrics({
 			pageViewId: PAGE_VIEW_ID,
 			browserId: BROWSER_ID,
@@ -89,8 +151,77 @@ describe('send commercial metrics code', () => {
 		expect((navigator.sendBeacon as jest.Mock).mock.calls).toEqual([]);
 	});
 
+	it('does not send metrics when user is not in sampling group', () => {
+		onConsentChange.mockImplementation(tcfv2AllConsent);
+
+		initCommercialMetrics({
+			pageViewId: PAGE_VIEW_ID,
+			browserId: BROWSER_ID,
+			isDev: IS_NOT_DEV,
+			adBlockerInUse: ADBLOCK_NOT_IN_USE,
+			sampling: USER_NOT_IN_SAMPLING,
+		});
+
+		setVisibility('hidden');
+		global.dispatchEvent(new Event('visibilitychange'));
+
+		expect((navigator.sendBeacon as jest.Mock).mock.calls).toEqual([]);
+	});
+
+	it('does not send metrics when consent is not given', () => {
+		initCommercialMetrics({
+			pageViewId: PAGE_VIEW_ID,
+			browserId: BROWSER_ID,
+			isDev: IS_NOT_DEV,
+			adBlockerInUse: ADBLOCK_NOT_IN_USE,
+			sampling: USER_IN_SAMPLING,
+		});
+
+		setVisibility('hidden');
+		global.dispatchEvent(new Event('visibilitychange'));
+
+		expect((navigator.sendBeacon as jest.Mock).mock.calls).toEqual([]);
+	});
+
+	it('does not send metrics when consent does not include purpose 8', () => {
+		onConsentChange.mockImplementation(tcfv2AllConsentExceptPurpose8);
+
+		initCommercialMetrics({
+			pageViewId: PAGE_VIEW_ID,
+			browserId: BROWSER_ID,
+			isDev: IS_NOT_DEV,
+			adBlockerInUse: ADBLOCK_NOT_IN_USE,
+			sampling: USER_IN_SAMPLING,
+		});
+
+		setVisibility('hidden');
+		global.dispatchEvent(new Event('visibilitychange'));
+
+		expect((navigator.sendBeacon as jest.Mock).mock.calls).toEqual([]);
+	});
+
+	it('sends metrics when consent is non-TCFv2 (i.e. when user is in USA or Australia)', () => {
+		onConsentChange.mockImplementation(nonTcfv2Consent);
+
+		initCommercialMetrics({
+			pageViewId: PAGE_VIEW_ID,
+			browserId: BROWSER_ID,
+			isDev: IS_NOT_DEV,
+			adBlockerInUse: ADBLOCK_NOT_IN_USE,
+			sampling: USER_IN_SAMPLING,
+		});
+
+		setVisibility('hidden');
+		global.dispatchEvent(new Event('visibilitychange'));
+
+		expect((navigator.sendBeacon as jest.Mock).mock.calls).toEqual([
+			[Endpoints.PROD, JSON.stringify(defaultMetrics)],
+		]);
+	});
+
 	describe('bypassCommercialMetricsSampling', () => {
 		it('sends a beacon if bypassed asynchronously', () => {
+			onConsentChange.mockImplementation(tcfv2AllConsent);
 			initCommercialMetrics({
 				pageViewId: PAGE_VIEW_ID,
 				browserId: BROWSER_ID,
@@ -122,6 +253,7 @@ describe('send commercial metrics code', () => {
 		});
 
 		it('should handle endpoint in dev', () => {
+			onConsentChange.mockImplementation(tcfv2AllConsent);
 			initCommercialMetrics({
 				pageViewId: PAGE_VIEW_ID,
 				browserId: BROWSER_ID,
@@ -147,6 +279,7 @@ describe('send commercial metrics code', () => {
 		});
 
 		it('should handle connection properties if they exist', () => {
+			onConsentChange.mockImplementation(tcfv2AllConsent);
 			initCommercialMetrics({
 				pageViewId: PAGE_VIEW_ID,
 				browserId: BROWSER_ID,
@@ -185,6 +318,7 @@ describe('send commercial metrics code', () => {
 				downlink: 1,
 				effectiveType: '4g',
 			};
+			onConsentChange.mockImplementation(tcfv2AllConsent);
 			initCommercialMetrics({
 				pageViewId: PAGE_VIEW_ID,
 				browserId: BROWSER_ID,
@@ -240,6 +374,7 @@ describe('send commercial metrics code', () => {
 				downlink: 1,
 				effectiveType: '4g',
 			};
+			onConsentChange.mockImplementation(tcfv2AllConsent);
 			initCommercialMetrics({
 				pageViewId: PAGE_VIEW_ID,
 				browserId: BROWSER_ID,
@@ -265,6 +400,7 @@ describe('send commercial metrics code', () => {
 		});
 
 		it('should handle ad slot properties', () => {
+			onConsentChange.mockImplementation(tcfv2AllConsent);
 			initCommercialMetrics({
 				pageViewId: PAGE_VIEW_ID,
 				browserId: BROWSER_ID,

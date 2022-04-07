@@ -1,3 +1,5 @@
+import { onConsentChange } from '@guardian/consent-management-platform';
+import type { ConsentState } from '@guardian/consent-management-platform/dist/types';
 import { log } from '@guardian/libs';
 import { EventTimer } from './event-timer';
 
@@ -46,6 +48,7 @@ let commercialMetricsPayload: CommercialMetricsPayload = {
 let devProperties: Property[] | [] = [];
 let adBlockerProperties: Property[] | [] = [];
 let initialised = false;
+let consented = false;
 let endpoint: Endpoints;
 
 const setEndpoint = (isDev: boolean) =>
@@ -105,6 +108,8 @@ const roundTimeStamp = (events: TimedEvent[]): Metric[] => {
 };
 
 function sendMetrics() {
+	if (!consented) return;
+
 	log(
 		'commercial',
 		'About to send commercial metrics',
@@ -159,6 +164,21 @@ const addVisibilityListeners = (): void => {
 	window.addEventListener('pagehide', listener);
 };
 
+const addConsentListener = (): void => {
+	onConsentChange((consentState: ConsentState) => {
+		if (consentState.tcfv2) {
+			// TCFv2 mode - check for consent
+			const consents = consentState.tcfv2.consents;
+			const REQUIRED_CONSENTS = [7, 8];
+
+			consented = REQUIRED_CONSENTS.every((consent) => consents[consent]);
+		} else {
+			// non-TCFv2 mode - don't check for consent
+			consented = true;
+		}
+	});
+};
+
 /**
  * A method to asynchronously send metrics after initialization.
  */
@@ -168,6 +188,7 @@ function bypassCommercialMetricsSampling(): void {
 		return;
 	}
 
+	addConsentListener();
 	addVisibilityListeners();
 }
 
@@ -209,6 +230,7 @@ function initCommercialMetrics({
 	const userIsInSamplingGroup = Math.random() <= sampling;
 
 	if (isDev || userIsInSamplingGroup) {
+		addConsentListener();
 		addVisibilityListeners();
 		return true;
 	}
@@ -225,6 +247,7 @@ export const _ = {
 	transformToObjectEntries,
 	reset: (): void => {
 		initialised = false;
+		consented = false;
 		commercialMetricsPayload = {
 			page_view_id: undefined,
 			browser_id: undefined,
